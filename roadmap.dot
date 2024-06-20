@@ -1,0 +1,132 @@
+digraph roadmap
+{
+	rankdir=LR
+
+	//node info
+	latentpink[shape=box, label=<
+		<b>LATENTPINK</b><br align="left"/>
+		Benchtop switch prototype w/ 14x 1G + 1x 10G ports<br align="left"/>
+		<i>Status:</i> Mostly working, some PCB bugs but bodged enough for testing<br align="left"/>
+		>];
+	latentred[shape=box, label=<
+		<b>LATENTRED</b><br align="left"/>
+		1U Ethernet switch w/ 48x 1G + 2x 25G ports<br align="left"/>
+		<i>Status:</i> Very early schematic capture<br align="left"/>
+		>];
+	"kup-lulz"[shape=box, label=<
+		<b>kup-lulz</b><br align="left"/>
+		Kintex UltraScale+ test board on OSHPark 4 layer<br align="left"/>
+		<i>Status:</i> PCB close to done, but planning to swap the MCUs for beefier ones<br align="left"/>
+		>];
+	"stm32-cpp"[shape=box, label=<
+		<b>stm32-cpp</b><br align="left"/>
+		C++ peripheral library for stm32<br align="left"/>
+		<i>Status:</i> In use across many projects already<br align="left"/>
+		>];
+	"common-embedded-platform"[shape=box, label=<
+		<b>common-embedded-platform</b><br align="left"/>
+		Core libraries and bootloaders<br align="left"/>
+		<i>Status:</i> In use across many projects already<br align="left"/>
+		>];
+	staticnet[shape=box, label=<
+		<b>staticnet</b><br align="left"/>
+		Bare metal TCP/IP stack and SSH server<br align="left"/>
+		<i>Status:</i> Seems usable, needs security review and more testing<br align="left"/>
+		>];
+	libscopehal[shape=box, label=<
+		<b>libscopehal</b><br align="left"/>
+		T&amp;M hardware abstraction library<br align="left"/>
+		<i>Status:</i> Under active development<br align="left"/>
+		>];
+	ngscopeclient[shape=box, label=<
+		<b>ngscopeclient</b><br align="left"/>
+		T&amp;M GUI<br align="left"/>
+		<i>Status:</i> Under active development<br align="left"/>
+		>];
+	microkvs[shape=box, label=<
+		<b>microkvs</b><br align="left"/>
+		Tiny key-value store for configuration data<br align="left"/>
+		<i>Status:</i> In use across many projects already<br align="left"/>
+		>];
+	"microkvs-stress-test"[shape=box, label=<
+		<b>microkvs-stress-test</b><br align="left"/>
+		Power loss integrity verification for microkvs<br align="left"/>
+		<i>Status:</i> Actively working on firmware<br align="left"/>
+		>];
+	grover[shape=box, label=<
+		<b>GROVER</b><br align="left"/>
+		25/100G 1U BERT<br align="left"/>
+		<i>Status:</i> Very early schematic capture<br align="left"/>
+		>];
+	thunderscope[shape=box, label=<
+		<b>thunderscope</b><br align="left"/>
+		Thunderbolt-connected entry level oscilloscope<br align="left"/>
+		<i>Status:</i> Mostly developed by external team, need to optimize scopehal driver<br align="left"/>
+		>];
+	"symmetricom-breakout"[shape=box, label=<
+		<b>symmetricom-breakout</b><br align="left"/>
+		Symmetricom SA.22C breakout/control board<br align="left"/>
+		<i>Status:</i> Board shipped, ETA 2024-06-20<br align="left"/>
+		>];
+	"GPSDO video"[shape=box, label=<
+		<b>GPSDO video</b><br align="left"/>
+		Stanford Research FS752 teardown, review, and experiments<br align="left"/>
+		<i>Status:</i> Teardown filmed, need Symmetricom board for experiments<br align="left"/>
+		>];
+	"blondel"[shape=box, label=<
+		<b>BLONDEL</b><br align="left"/>
+		28 channel, 16 bit, 100 Msps 1U oscilloscope<br align="left"/>
+		<i>Status:</i> High level architecture in progress<br align="left"/>
+		>];
+	"trigger-crossbar"[shape=box, label=<
+		<b>trigger-crossbar</b><br align="left"/>
+		Trigger synchronization for multiple lab instruments, plus 10G BERT/LA<br align="left"/>
+		<i>Status:</i> Core features functional, CDR LA and CDR trigger still need work<br align="left"/>
+		>];
+	"fpga-stm32-ifaces"[shape=box, label=<
+		<b>fpga-stm32-ifaces</b><br align="left"/>
+		Testbed for QSPI, OCTOSPI, HyperBus, FMC interfaces between STM32H7 and Xilinx FPGA<br align="left"/>
+		<i>Status:</i> PCB ordered 2024-06-19<br align="left"/>
+		>];
+
+	//library
+	"stm32-cpp" -> "common-embedded-platform" [color=blue]
+	"microkvs-stress-test" -> microkvs [color=red]
+
+	//scopehal stuff
+	libscopehal -> ngscopeclient [color=blue]
+	ngscopeclient -> thunderscope [color=orange]
+	ngscopeclient -> blondel [color=orange]
+
+	//networking
+	latentpink -> latentred [color=red]
+	"kup-lulz" -> latentred [color=red]
+	"common-embedded-platform" -> latentred [color=blue]
+	microkvs -> latentred [color=blue]
+	staticnet -> latentred [color=blue]
+
+	//grover
+	"kup-lulz" -> grover [color=red]
+	ngscopeclient -> grover [color=orange]
+	"common-embedded-platform" -> grover [color=blue]
+	staticnet -> grover [color=blue]
+	"trigger-crossbar" -> grover[color=red]
+
+	//blondel
+	microkvs -> blondel [color=blue]
+
+	//trigger crossbar
+	ngscopeclient -> "trigger-crossbar" [color=orange]
+	"common-embedded-platform" -> "trigger-crossbar" [color=blue]
+	staticnet -> "trigger-crossbar" [color=blue]
+	microkvs -> "trigger-crossbar" [color=blue]
+
+	//interface test
+	"common-embedded-platform" -> "fpga-stm32-ifaces" [color=blue]
+	"fpga-stm32-ifaces" -> blondel [color=red]
+	"fpga-stm32-ifaces" -> latentred [color=red]
+	"fpga-stm32-ifaces" -> grover [color=red]
+
+	//video
+	"symmetricom-breakout" -> "GPSDO video" [color=green]
+}
